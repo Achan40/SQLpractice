@@ -37,3 +37,70 @@ SELECT * FROM customer WHERE first_name IN ('John','Jake','Julie');
 /*LIKE is case sensitive, ILIKE is case insensitive*/
 SELECT * FROM customer WHERE first_name LIKE 'J%' AND last_name LIKE 'S%';/*everyone with a firstname starting with the letter J and the last name starting with the letter S*/
 SELECT * FROM customer WHERE first_name LIKE '%er%';/*everyone who has a first name where er shows up somewhere*/
+
+/*Aggregation Functions*/
+/*Only happen in the SELECT clause or HAVING clause*/
+SELECT MAX(replacement_cost) FROM film;
+SELECT MIN(replacement_cost) FROM film;
+SELECT MIN(replacement_cost), MAX(replacement_cost) FROM film;
+
+SELECT ROUND(AVG(replacement_cost),3) FROM film;
+
+/*GROUP BY*/
+/*must appear right after a FROM or WHERE statement*/
+SELECT customer_id,SUM(amount) FROM payment GROUP BY customer_id ORDER BY SUM(amount);
+SELECT customer_id,staff_id,SUM(amount) FROM payment GROUP BY staff_id,customer_id ORDER BY customer_id;
+
+SELECT DATE(payment_date),SUM(amount) FROM payment GROUP BY DATE(payment_date) ORDER BY SUM(amount);
+SELECT rating,AVG(replacement_cost) FROM film GROUP BY rating;
+SELECT customer_id,SUM(amount) FROM payment GROUP BY customer_id ORDER BY SUM(amount) DESC;
+
+/*HAVING*/
+/* comes after a GROUP BY, used to select information based on aggregate funciton*/
+SELECT customer_id,SUM(amount) FROM payment WHERE customer_id NOT IN (184,87,477) GROUP BY customer_id HAVING SUM(amount) > 100;
+SELECT customer_id, COUNT(payment_id) FROM payment GROUP BY customer_id HAVING COUNT(payment_id) >= 40;
+
+/*JOINS*/
+/*combine info from multiple tables*/
+
+/*AS*/
+/*rename columns*/
+SELECT customer_id AS cust_id FROM payment;
+SELECT COUNT(amount) AS num_transactions FROM payment;
+
+/*INNER JOIN*/
+/*result with the set of records that match in both tables (grab everything)*/
+SELECT payment_id,payment.customer_id,first_name  FROM payment INNER JOIN customer ON payment.customer_id = customer.customer_id;
+SELECT district,email FROM address JOIN customer ON address.address_id = customer.address_id WHERE district = 'California';
+
+/*FULL OUTER JOIN*/
+/*dealing with values only present in one of the tables being joined*/
+SELECT * FROM customer 
+FULL OUTER JOIN payment 
+ON customer.customer_id = payment.customer_id
+WHERE customer.customer_id IS null
+OR payment.payment_id IS null; /*there are no completely unique rows*/
+
+SELECT first_name,last_name,film.title FROM actor
+JOIN film_actor
+ON actor.actor_id = film_actor.actor_id
+JOIN film
+ON film_actor.film_id = film.film_id
+WHERE first_name = 'Nick' AND last_name = 'Wahlberg';
+/*All movies that Nick Wahlberg has been in*/
+
+/*LEFT OUTER JOIN*/
+/*Results in the set of records that are in the left table, if there is no match w right table, then result is null*/
+/*order matters*/
+SELECT film.film_id, film.title, inventory_id
+FROM film
+LEFT JOIN inventory ON
+inventory.film_id = film.film_id;
+
+
+/*RIGHT OUTER JOIN*/
+/*Left join but table is switched*/
+
+/*UNION*/
+/*combine the result-set of two or more select statements*/
+ 
